@@ -67,7 +67,7 @@ resource "aws_security_group" "app_sg" {
   egress {
     from_port = 0
     to_port = 0
-    protocol = -1
+    protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
@@ -82,20 +82,13 @@ resource "aws_instance" "app_instance" {
     associate_public_ip_address = true
 
     user_data = <<-EOF
-
-    #!/bin/bash -ex
-
-    yum update -y
-    amazon-linux-extras enable nginx1
-    yum clean metadata
-    yum install nginx -y
-
-    mkdir -p /usr/share/nginx/html
-    echo "<h1>This is my new server</h1>" > /usr/share/nginx/html/index.html
-
-    systemctl enable nginx
-    systemctl start nginx
-    EOF
+              #!/bin/bash
+              yum update -y
+              yum install -y httpd
+              systemctl start httpd
+              systemctl enable httpd
+              echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
+              EOF
 
     tags = {
         "Name" : var.ec2_name
